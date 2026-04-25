@@ -1,0 +1,479 @@
+{
+    "name": "pl_scl",
+    "properties": {
+        "activities": [
+            {
+                "name": "nonpersonal_cust_cpy",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "Lookup_New_Water_Table",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "modifiedDatetimeStart": {
+                                "value": "@activity('Lookup_Old_Water_Table').output",
+                                "type": "Expression"
+                            },
+                            "modifiedDatetimeEnd": {
+                                "value": "@activity('Lookup_New_Water_Table').outputactivity('Lookup_New_Water_Table').output",
+                                "type": "Expression"
+                            },
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureSqlSink",
+                        "writeBehavior": "insert",
+                        "sqlWriterUseTableLock": false
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "customer_id",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "customer_id",
+                                    "type": "Int32",
+                                    "physicalType": "int"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "customer_owned_by",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "customer_owned_by",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "customer_indicator",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "customer_indicator",
+                                    "type": "String",
+                                    "physicalType": "char"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "customer_src_type",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "customer_src_type",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "first_contact_date",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "first_contact_date",
+                                    "type": "DateTime",
+                                    "physicalType": "datetime"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "occupation_code",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "occupation_code",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "occupation_description",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "occupation_description",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "special_credit_indicator",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "special_credit_indicator",
+                                    "type": "String",
+                                    "physicalType": "char"
+                                }
+                            }
+                        ],
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                            "allowDataTruncation": true,
+                            "treatBooleanAsNumber": false
+                        }
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "ds_scl",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "p_file_name": "nonpersonal_cust.csv"
+                        }
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "ds_scl_Sink",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "p_table_name": "nonpersonal_cust"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "customer_portfolio_cpy",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "nonpersonal_cust_cpy",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "DelimitedTextSource",
+                        "storeSettings": {
+                            "type": "AzureBlobFSReadSettings",
+                            "recursive": true,
+                            "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                            "type": "DelimitedTextReadSettings"
+                        }
+                    },
+                    "sink": {
+                        "type": "AzureSqlSink",
+                        "writeBehavior": "insert",
+                        "sqlWriterUseTableLock": false
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "mappings": [
+                            {
+                                "source": {
+                                    "name": "customer_id",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "customer_id",
+                                    "type": "Int32",
+                                    "physicalType": "int"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "name": "post_code",
+                                    "type": "String",
+                                    "physicalType": "String"
+                                },
+                                "sink": {
+                                    "name": "post_code",
+                                    "type": "String",
+                                    "physicalType": "varchar"
+                                }
+                            }
+                        ],
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                            "allowDataTruncation": true,
+                            "treatBooleanAsNumber": false
+                        }
+                    }
+                },
+                "inputs": [
+                    {
+                        "referenceName": "ds_scl",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "p_file_name": "Customer_Portfolio.csv"
+                        }
+                    }
+                ],
+                "outputs": [
+                    {
+                        "referenceName": "ds_scl_Sink",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "p_table_name": "Customer_Portfolio"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "sp_write_error_log",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [
+                    {
+                        "activity": "set_error_context_non",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "set_error_context",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[dbo].[sp_write_error_log]",
+                    "storedProcedureParameters": {
+                        "p_activity_name": {
+                            "value": {
+                                "value": "@variables('v_activity_name')",
+                                "type": "Expression"
+                            },
+                            "type": "String"
+                        },
+                        "p_error_msg": {
+                            "value": "",
+                            "type": "String"
+                        },
+                        "p_pipeline_name": {
+                            "value": "",
+                            "type": "String"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "ls_scl_sql_db",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "set_error_context",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "customer_portfolio_cpy",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "v_activity_name",
+                    "value": {
+                        "value": "customer_portfolio_cpy",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "set_error_context_non",
+                "type": "SetVariable",
+                "dependsOn": [
+                    {
+                        "activity": "nonpersonal_cust_cpy",
+                        "dependencyConditions": [
+                            "Failed"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "v_activity_name",
+                    "value": {
+                        "value": "nonpersonal_cust_cpy",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Lookup_Old_Water_Table",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None"
+                    },
+                    "dataset": {
+                        "referenceName": "ds_scl_Sink",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "p_table_name": "watermark_table"
+                        }
+                    },
+                    "firstRowOnly": false
+                }
+            },
+            {
+                "name": "Lookup_New_Water_Table",
+                "type": "Lookup",
+                "dependsOn": [
+                    {
+                        "activity": "Lookup_Old_Water_Table",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "sqlReaderQuery": "SELECT GETDATE() as NewWatermarkValue",
+                        "queryTimeout": "00:10:00",
+                        "partitionOption": "None"
+                    },
+                    "dataset": {
+                        "referenceName": "ds_scl_Sink",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "p_table_name": "Update_Watermark"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "update_watermark",
+                "type": "SqlServerStoredProcedure",
+                "dependsOn": [
+                    {
+                        "activity": "customer_portfolio_cpy",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.00:10:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "storedProcedureName": "[dbo].[sp_update_watermark]",
+                    "storedProcedureParameters": {
+                        "p_new_watermark": {
+                            "value": {
+                                "value": "@activity('Lookup_New_Water_Table').output.firstRow.NewWatermarkValue",
+                                "type": "Expression"
+                            },
+                            "type": "DateTime"
+                        },
+                        "p_table_name": {
+                            "value": {
+                                "value": "@activity('nonpersonal_cust_cpy').output",
+                                "type": "Expression"
+                            },
+                            "type": "String"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "ls_scl_sql_db",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "variables": {
+            "v_activity_name": {
+                "type": "String"
+            }
+        },
+        "annotations": []
+    }
+}
