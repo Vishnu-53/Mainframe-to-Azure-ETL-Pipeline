@@ -1,0 +1,95 @@
+
+{
+    "name": "ds_scl",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "ls_scl",
+            "type": "LinkedServiceReference"
+        },
+        "parameters": {
+            "p_file_name": {
+                "type": "string"
+            }
+        },
+        "annotations": [],
+        "type": "DelimitedText",
+        "typeProperties": {
+            "location": {
+                "type": "AzureBlobFSLocation",
+                "fileName": {
+                    "value": "@dataset().p_file_name",
+                    "type": "Expression"
+                },
+                "fileSystem": "landingzone"
+            },
+            "columnDelimiter": ",",
+            "escapeChar": "\\",
+            "firstRowAsHeader": true,
+            "quoteChar": "\""
+        },
+        "schema": [
+            {
+                "name": "customer_id",
+                "type": "String"
+            },
+            {
+                "name": "customer_owned_by",
+                "type": "String"
+            },
+            {
+                "name": "customer_indicator",
+                "type": "String"
+            },
+            {
+                "name": "customer_src_type",
+                "type": "String"
+            },
+            {
+                "name": "first_contact_date",
+                "type": "String"
+            },
+            {
+                "name": "occupation_code",
+                "type": "String"
+            },
+            {
+                "name": "occupation_description",
+                "type": "String"
+            },
+            {
+                "name": "special_credit_indicator",
+                "type": "String"
+            }
+        ]
+    }
+}
+
+
+
+--
+
+
+{
+    "name": "ds_scl_Sink",
+    "properties": {
+        "linkedServiceName": {
+            "referenceName": "ls_scl_sql_db",
+            "type": "LinkedServiceReference"
+        },
+        "parameters": {
+            "p_table_name": {
+                "type": "string"
+            }
+        },
+        "annotations": [],
+        "type": "AzureSqlTable",
+        "schema": [],
+        "typeProperties": {
+            "schema": "dbo",
+            "table": {
+                "value": "@dataset().p_table_name",
+                "type": "Expression"
+            }
+        }
+    }
+}
